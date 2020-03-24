@@ -5,13 +5,21 @@ import csv
 import os
 import pprint
 import re
+import sys
 
-parser = argparse.ArgumentParser(description='A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data')
+parser = argparse.ArgumentParser(
+    description='A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data',
+    usage='%(prog)s --countries US Italy --covid-path ~/dev/COVID-19 [--recent-days 1]'
+)
 parser.add_argument('--covid-path', type=str, nargs=1, help='path to where the COVID repository was cloned')
 parser.add_argument('--countries', type=str, nargs='+', help='countries to include')
 parser.add_argument('--recent-days', type=int, nargs='?', help='include this many recent days')
 
 args = parser.parse_args()
+
+if args.covid_path == None:
+    parser.print_help()
+    sys.exit()
 
 covid_path = args.covid_path[0]
 

@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import operator
 import os
 import pprint
 import re
@@ -14,6 +15,8 @@ parser = argparse.ArgumentParser(
 parser.add_argument('--covid-path', type=str, nargs=1, help='path to where the COVID repository was cloned')
 parser.add_argument('--countries', type=str, nargs='+', help='countries to include')
 parser.add_argument('--recent-days', type=int, nargs='?', help='include this many recent days')
+parser.add_argument('--worst-country-count', type=int, nargs='?', help='number of countries to include in the worst list', default=10)
+parser.add_argument('--worst-days', type=int, nargs='?', help='number of days to show the worst confirmed and death numberds ')
 
 args = parser.parse_args()
 
@@ -26,6 +29,43 @@ covid_path = args.covid_path[0]
 recent_days = args.recent_days
 
 pp = pprint.PrettyPrinter(indent=4)
+
+def worst_func(confirmeds, deaths, worst_day, worst_country_count):
+
+    for ref in [
+        {
+            'dictionary' : confirmeds,
+            'name'       : 'confirmeds'
+        },
+        {
+            'dictionary' : deaths,
+            'name'       : 'deaths'
+        }
+    ]:
+        totals = {}
+
+        print 'worst %s over the last %d days' % (ref['name'], worst_days)
+
+        for country in ref['dictionary'].keys():
+            day_totals = []
+
+            yesterday = 0
+            for day in sorted(ref['dictionary'][country].keys(), cmp=my_sort):
+                day_total = ref['dictionary'][country][day]
+                diff = day_total - yesterday
+                day_totals.append(diff)
+                yesterday = day_total
+
+            totals[country] = sum(day_totals[len(day_totals) - worst_days:len(day_totals)])
+
+        printed = 0
+        for country, total in sorted(totals.items(), key=lambda kv: kv[1], reverse=True):
+            print "%s -> %s" % (country, totals[country])
+            printed = printed + 1
+            if(printed > worst_country_count):
+                break
+
+        print
 
 def populate(path):
     country_day_hash = {}
@@ -96,7 +136,7 @@ def show_country(country, confirmed, deaths):
         yesterday_deaths = death_today_total;
 
     if(recent_days != None and len(day_strings) > recent_days):
-        day_strings = day_strings[len(day_strings) - recent_days - 1:len(day_strings) - 1]
+        day_strings = day_strings[len(day_strings) - recent_days:len(day_strings)]
 
     for day_string in day_strings:
         print day_string
@@ -109,3 +149,9 @@ deaths = populate(os.path.join(covid_path,  'csse_covid_19_data', 'csse_covid_19
 
 for country in args.countries:
     show_country(country, confirmeds, deaths)
+
+worst_days = args.worst_days
+worst_country_count = args.worst_country_count
+
+if(worst_days != None):
+    worst_func(confirmeds, deaths, worst_days, worst_country_count)

@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser(
     usage='%(prog)s --countries US Italy --covid-path ~/dev/COVID-19 [--recent-days 1]'
 )
 parser.add_argument('--covid-path', type=str, nargs=1, help='path to where the COVID repository was cloned')
-parser.add_argument('--countries', type=str, nargs='+', help='countries to include')
+parser.add_argument('--countries', type=str, nargs='+', help='countries to include in by-day report')
 parser.add_argument('--recent-days', type=int, nargs='?', help='include this many recent days')
 parser.add_argument('--worst-country-count', type=int, nargs='?', help='number of countries to include in the worst list', default=10)
 parser.add_argument('--worst-days', type=int, nargs='?', help='number of days to show the worst confirmed and death numberds ')

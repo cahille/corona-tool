@@ -62,7 +62,7 @@ def worst_func(confirmeds, deaths, worst_day, worst_country_count):
         for country, total in sorted(totals.items(), key=lambda kv: kv[1], reverse=True):
             print "%s -> %s" % (country, totals[country])
             printed = printed + 1
-            if(printed > worst_country_count):
+            if(printed >= worst_country_count):
                 break
 
         print
@@ -144,8 +144,8 @@ def show_country(country, confirmed, deaths):
     print "\n"
 
     
-confirmeds = populate(os.path.join(covid_path, 'csse_covid_19_data', 'csse_covid_19_time_series', 'time_series_19-covid-Confirmed.csv'))
-deaths = populate(os.path.join(covid_path,  'csse_covid_19_data', 'csse_covid_19_time_series', 'time_series_19-covid-Deaths.csv'))
+confirmeds = populate(os.path.join(covid_path, 'csse_covid_19_data', 'csse_covid_19_time_series', 'time_series_covid19_confirmed_global.csv'))
+deaths = populate(os.path.join(covid_path,  'csse_covid_19_data', 'csse_covid_19_time_series', 'time_series_covid19_deaths_global.csv'))
 
 for country in args.countries:
     show_country(country, confirmeds, deaths)

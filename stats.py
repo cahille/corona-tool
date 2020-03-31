@@ -8,6 +8,45 @@ import pprint
 import re
 import sys
 
+# populations from https://www.worldometers.info/world-population/population-by-country/
+# as of March 30, 2020
+
+populations = {
+    'Australia'          : 25499884,
+    'Austria'            : 9006398,
+    'Belgium'            : 11589623,
+    'Brazil'             : 212559417,
+    'Canada'             : 37742154,
+    'Chile'              : 19116201,
+    'China'              : 1439323776,
+    'Denmark'            : 5792202,
+    'Dominican Republic' : 10847910, 
+    'Ecuador'            : 17643054,
+    'France'             : 65273511,
+    'Germany'            : 83783942,
+    'Greece'             : 10423054,
+    'Indonesia'          : 273523615,
+    'Iran'               : 83992949,
+    'Ireland'            : 4937786,
+    'Israel'             : 8655535,
+    'Italy'              : 60461826,
+    'Korea, South'       : 51269185,
+    'Malaysia'           : 32365999,
+    'Netherlands'        : 17134872,
+    'Norway'             : 5421241,
+    'Philippines'        : 109581078,
+    'Poland'             : 37846611,
+    'Portugal'           : 10196709,
+    'Romania'            : 19237691,
+    'Russia'             : 145934462,
+    'Spain'              : 46754778,
+    'Sweden'             : 10099265,
+    'Switzerland'        : 8654622,
+    'Turkey'             : 84339067,
+    'US'                 : 331002651,
+    'United Kingdom'     : 67886011
+}
+
 parser = argparse.ArgumentParser(
     description='A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data',
     usage='%(prog)s --countries US Italy --covid-path ~/dev/COVID-19 [--recent-days 1]'
@@ -30,21 +69,29 @@ recent_days = args.recent_days
 
 pp = pprint.PrettyPrinter(indent=4)
 
+def get_per_k(country, number, k):
+    population = populations[country]
+    ks = population / (k * 1000)
+    return number / ks
+
 def worst_func(confirmeds, deaths, worst_day, worst_country_count):
 
     for ref in [
         {
             'dictionary' : confirmeds,
-            'name'       : 'confirmeds'
+            'k'          : 100,
+            'name'       : 'Confirmeds'
         },
         {
             'dictionary' : deaths,
-            'name'       : 'deaths'
+            'k'          : 1000,
+            'name'       : 'Deaths'
         }
     ]:
         totals = {}
 
-        print 'worst %s over the last %d days' % (ref['name'], worst_days)
+        print 'Worst %s over the last %d days' % (ref['name'].lower(), worst_days)
+        print '%20s\t\t%10s\t%11s' % ('Country', ref['name'], 'Per ' + ('Million' if(ref['k'] == 1000) else str(ref['k']) + 'k'))
 
         for country in ref['dictionary'].keys():
             day_totals = []
@@ -60,7 +107,7 @@ def worst_func(confirmeds, deaths, worst_day, worst_country_count):
 
         printed = 0
         for country, total in sorted(totals.items(), key=lambda kv: kv[1], reverse=True):
-            print "%s -> %s" % (country, totals[country])
+            print "%20s\t\t%10s\t%11s" % (country, totals[country], get_per_k(country, totals[country], ref['k']))
             printed = printed + 1
             if(printed >= worst_country_count):
                 break
@@ -109,7 +156,7 @@ def my_sort(a, b):
    return int(a_values[2]) - int(b_values[2]) or int(a_values[0]) - int(b_values[0]) or int(a_values[1]) - int(b_values[1])
 
 def show_country(country, confirmed, deaths):
-    print country + "\n\tDay\t\t%-8s\t%9s\t%8s\t%6s\t\t%8s" % ("Date", "Confirmed", "Increase", "Deaths", "Increase")
+    print country + "\n\tDay\t\t%-8s\t%9s\t%8s\t%8s\t%6s\t\t%11s\t%8s" % ("Date", "Confirmed", "Per 100k", "Increase", "Deaths", "Per Million", "Increase")
 
     yesterday_deaths = 0;
     yesterday_confirmeds = 0;
@@ -130,7 +177,7 @@ def show_country(country, confirmed, deaths):
         death_diff = (death_today_total - yesterday_deaths) if death_today_total else 0
         confirmed_diff = confirmed_today_total - yesterday_confirmeds
 
-        day_strings.append("\t%3s\t\t%8s\t%9s\t%8s\t%6s\t\t%8s" % (days, day, confirmed_today_total, confirmed_diff, death_today_total, death_diff))
+        day_strings.append("\t%3s\t\t%8s\t%9s\t%8s\t%8s\t%6s\t\t%11s\t%8s" % (days, day, confirmed_today_total, get_per_k(country, confirmed_today_total, 100), confirmed_diff, death_today_total, get_per_k(country, death_today_total, 1000), death_diff))
 
         yesterday_confirmeds = confirmed_today_total;
         yesterday_deaths = death_today_total;

@@ -13,8 +13,8 @@ import sys
 populations = {}
 
 parser = argparse.ArgumentParser(
-    description='A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data',
-    usage='%(prog)s --locations US Italy --covid-path ~/dev/COVID-19 [--recent-days 1]'
+    description='A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data. --covid-path should point to where you cloned the Johns Hopkins COVID-19 repo',
+    usage='%(prog)s --county --recent-days 3 --covid-path ~/dev/COVID-19 --locations US Italy Russia --worst-days 3'
 )
 parser.add_argument('--covid-path', type=str, help='path to where the COVID repository was cloned')
 parser.add_argument('--county', action='store_true', help='report on worst counties')

@@ -1,7 +1,19 @@
 # corona-tool
 A tool for parsing and attempting find insights in the Johns Hopkins COVID-19 data
 
+You will have to have the Johns Hopkins data local, so clone it somewhere, like ~/dev/COVID-19
+
+```bash {cmd}
+git clone https://github.com/CSSEGISandData/COVID-19.git
+```
+
+Now clone this code, and see stats as per the following command
+
+```bash {cmd}
+git clone https://github.com/cahille/corona-tool.git
+cd corona-tool
 ./stats.py --countries US Italy China --covid-path ~/dev/COVID-19 --recent-days 5
+```
 
 US
 	Day		Date    	Confirmed	Increase	Deaths		Increase

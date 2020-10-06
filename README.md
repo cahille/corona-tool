@@ -7,7 +7,7 @@ You will have to have the Johns Hopkins data local, so clone it somewhere, like 
 git clone https://github.com/CSSEGISandData/COVID-19.git
 ```
 
-Now clone this code, and see stats as per the following command
+Now clone this code, and see stats as per the following command. Note well, the ```--covid-path``` which should point to where you cloned the Johns Hopkins data
 
 ```bash {cmd}
 git clone https://github.com/cahille/corona-tool.git
